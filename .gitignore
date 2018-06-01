@@ -1,0 +1,19 @@
+# system files
+.DS_Store
+
+# cache files
+.sass-cache
+
+# log files
+npm-debug.log
+
+# dependencies
+node_modules
+bower_components
+
+# temporary directories used by the scaffold
+tmp
+
+# generated output directory
+include
+TextEditor/testing2.py
