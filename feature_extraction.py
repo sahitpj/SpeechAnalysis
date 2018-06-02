@@ -44,6 +44,13 @@ class Feature_exctraction(object):
         return words
         
     def extract(self):
+        '''
+            We develop our features by using the TFidf tokeniser and by cleaning our text data before that
+            
+            We can now run our clustering algoirithm on it
+            
+            The above processes are for normalising it and for bringing it to lower case
+        '''
         self.speeches_df['data'] = [" ".join(review) for review in self.speeches_df['data'].values]
         self.speeches_df['clean_data'] =  self.speeches_df['data'].apply(self.preprocess)
         tokenizer = RegexpTokenizer(r'\w+')

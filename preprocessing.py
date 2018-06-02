@@ -22,8 +22,17 @@ class preprocessor(object):
         self.paths = paths
         self.speeches_data = []
         self.data_folder = folder
+        self.words_a= []
         
     def individual_processor(self, path, q):
+        
+        '''
+            We define an individual preprocessor which reads each file separartly
+          
+            this then extracts the number of sentences, the words and the sentences of the file
+            
+            We then use the file name to extract the place of the speech, and the date with the help of regex
+        '''
         
         corpusReader = nltk.corpus.PlaintextCorpusReader(
                 self.data_folder,
@@ -41,6 +50,8 @@ class preprocessor(object):
         filename = path.split('/')[-1]
                  
         data = self.data_extracter(path)
+        
+        self.words_a.extend(data.split())
             
         speech = {
                 'data': data,
@@ -61,6 +72,11 @@ class preprocessor(object):
         return data
         
     def language_identifier(self, line):
+        '''
+            we convert each word into ascii values and see if the following values comes in
+            
+            the range of the english alphabets and numericals
+        '''
         maxchar = ord(max(line))
         if 65 <= maxchar <= 90:
             return 1
@@ -78,6 +94,13 @@ class preprocessor(object):
             
             
     def Multi_Processor(self, paths):
+        '''
+            We apply Python's multi processing capability to speed to process
+            
+            of pre-processing almost 1500 files. We use the Process function which spawns individual
+            
+            Threads
+        '''
         for path in paths:
             q = Queue
             z = preprocessor()
