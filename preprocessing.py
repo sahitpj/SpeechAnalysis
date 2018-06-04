@@ -43,25 +43,46 @@ class preprocessor(object):
         number_of_words = len(
                 [word for sentence in corpusReader.sents() for word in sentence])
         
-        date = re.search(r'^[0-9]+_(\w+)_(\w+)_(\d+)', path)
+        place = re.search(r'_([a-zA-Z]+)_.txt$', path)
+        date = re.search( r'/Users/Sahit/Documents/GitHub/BBC_WorkSpace/PM_Speech_Analysis/Speeches/Speeches_Modi_Demo/\d+_(\d+)_([a-zA-Z]+)_(\d+)', path)
+    
         
-        city = re.search(r'(\D+).txt$')
+        #date = re.search(r'^[0-9]+_(\w+)_(\w+)_(\d+)', path)
+        #city = re.search(r'(\D+).txt$')
         
         filename = path.split('/')[-1]
                  
         data = self.data_extracter(path)
         
         self.words_a.extend(data.split())
-            
+        
         speech = {
                 'data': data,
                 'filename':filename,
-                'city':city,
-                'date':date,
                 'word_count':number_of_words,
                 'sentence_count': number_of_sentences,
                 'average_sentence_length': number_of_words / number_of_sentences
                 }
+        
+        try:
+            speech['city'] = place.group(1)
+        except:
+            speech['city'] = 'NA'  
+            
+            
+        date_ =  ' '.join([date.group(1), date.group(2), date.group(3)])
+    
+        day = date.group(1)
+        month = date.group(2)
+        year = date.group(3)
+        
+            
+        speech['date'] = date_
+        speech['day'] = day
+        speech['month'] = month
+        speech['year'] = year
+            
+        
         q.put(speech)
             
     def data_extracter(self, path):
