@@ -15,7 +15,7 @@ class Kmeans_cluster(object):
     def cluster(self):
         km = Kmean(n_clusters=self.number_of_clusters)
         
-        km.fit(X)
+        km.fit(self.X_features)
 
         order_centroids = km.cluster_centers_.argsort()[:, ::-1]
         terms = vectorizer.get_feature_names()

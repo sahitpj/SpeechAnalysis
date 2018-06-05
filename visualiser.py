@@ -8,17 +8,15 @@ Created on Mon Jun  4 14:03:34 2018
 
 import matplotlib.pyplot as plt 
 from mpl_toolkits.basemap import Basemap
-import warnings
-import matplotlib.cbook
 import numpy as np
 
 
-class map_visualiser(object):
+class visualiser(object):
     def __init__(self, speeches_df):
         self.speeches_df = speeches_df
         
         
-    def function(self, speeches_df):
+    def function_worldmap(self, speeches_df):
         from geopy.geocoders import Nominatim
         geolocator = Nominatim()
         
@@ -53,5 +51,20 @@ class map_visualiser(object):
         plt.title("PM Speeches")   
         plt.show() 
         
-    def 
+    def pie_chart(self, speeches_df, number_of_clusters=10):
+        #For this example we take the number of clusters as 10, so that we can fix the labels and also the colors 
+        sizes = [0]*number_of_clusters
+        for i in xrange(520):
+            sizes[speeches_df.loc[i, 'category']-1] += 1
+            
+        colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'red', 'white', 'tan', 'green', 'magenta', 'pink']
+        
+        labels = ['Topic1', 'Topic2', 'Topic3', 'Topic4', 'Topic5', 'Topic6', 'Topic7', 'Topic8', 'Topic9', 'Topic10']
+        plt.pie(sizes,  labels=labels, colors=colors,
+                autopct='%1.1f%%', shadow=True, startangle=140)
+            
+        
+        plt.axis('equal')
+        plt.show()
+
                 

@@ -1,32 +1,14 @@
 import pandas as pd
 import re
-pd.options.display.max_columns = 30  #Can't have too many columns.
-from datetime import datetime
-import dateutil.parser
 import nltk
 import numpy as np
-
-
-
 import os
-
-
 letters = 'abcdefghijklmnopqrstuvwxyz '
-
-
-
-
 from collections import Counter
-import re
-import string
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-import re
-from nltk.stem.porter import PorterStemmer
 from sklearn.cluster import KMeans
 
-from multiprocessing import Process, Queue
-from nltk.cluster.util import cosine_distance
+
 
 
 def preprocess(x):
@@ -72,7 +54,7 @@ def detect_language(line):
         return 1
     else:
         return 0
-#print editFiles 
+
 for filepath in editFiles:
     
     speech = {}
@@ -89,8 +71,7 @@ for filepath in editFiles:
         if detect_language(l[i]) == 1:
             oo = l[i].decode('utf-8')
             h.append(oo)
-                
-    #print h 
+
     number_of_words = len(h)
     
     words_in_speech.append(h)
@@ -114,6 +95,7 @@ for filepath in editFiles:
     speech['month'] = month
     speech['year'] = year
     speech['data'] = h
+    speech['category'] = 0 
     speech['word_count'] = number_of_words
     speeches_df.append(speech)
     #print speeches
@@ -128,44 +110,7 @@ import matplotlib.cbook
 from geopy.geocoders import Nominatim
 geolocator = Nominatim()
 
-fig = plt.figure(num=None, figsize=(12, 8) )
-m = Basemap(projection='merc',llcrnrlat=-80,urcrnrlat=80,llcrnrlon=-180,urcrnrlon=180,resolution='c')
-m.drawcoastlines()
-#m.fillcontinents(color='tan',lake_color='lightblue')
-m.drawparallels(np.arange(-90.,91.,30.),labels=[True,True,False,False],dashes=[2,2])
-m.drawmeridians(np.arange(-180.,181.,60.),labels=[False,False,False,True],dashes=[2,2])
-m.drawmapboundary(fill_color='lightblue')
 
-count = 0
-'''
-for i in xrange(520):
-    try:
-        r = modi_df.loc[i]
-        location = geolocator.geocode(r['city'])
-        longitude = location.longitude
-        latitude = location.latitude  
-        x,y = m(longitude, latitude)
-        year_ = int(r['year'])
-        if year_ == 2014: 
-            m.plot(x,y,marker='o',color='r',markersize=2)
-        elif year_ == 2015:
-            m.plot(x,y,marker='o',color='m',markersize=2)
-        elif year_ == 2016:
-            m.plot(x,y,marker='o',color='g',markersize=2)
-        elif year_ == 2017:
-            m.plot(x,y,marker='o',color='y',markersize=2)
-        count += 1
-    except:
-        None
-        
-    print count
-    
-
-plt.title("PM Speeches")   
-plt.show() 
-'''    
-
-print set(modi_df['year'].values) 
 
 from nltk.tokenize import RegexpTokenizer
 tokenizer = RegexpTokenizer(r'\w+')
@@ -196,8 +141,6 @@ vectorizer = TfidfVectorizer(
 X = vectorizer.fit_transform(modi_df['tokenised'])
 
 
-print modi_df
-
 # X is now our featured documents with inverse frequencies as individual feature values.
 def c_distance(a, b):
     if a.shape[0] == b.shape[0]:
@@ -206,7 +149,7 @@ def c_distance(a, b):
         b = np.array(csr_matrix(b).todense())
         for i in xrange(a.shape[0]):
             r += a[i][0]*b[i][0]
-        return r/((np.linalg.norm(a)*np.linalg.norm(b))**0.5)
+        return r/((np.linalg.norm(a)*np.linalg.norm(b)))
     else:
         print 'Dimension mismatch'
 
@@ -221,14 +164,11 @@ terms = vectorizer.get_feature_names()
 for i in range(number_of_clusters):
     top_words = [terms[ind] for ind in order_centroids[i, :7]]
     print("Cluster {}: {}".format(i, ' '.join(top_words)))
-    
-    
-print order_centroids    
-
+      
 category_ = np.zeros((520, 1))
 for i in xrange(520):
     score = 0
-    for j in xrange(10):
+    for j in xrange(number_of_clusters):
         v1 = order_centroids[j, :].T
         v2 = X[i, :].T
         p = c_distance(v1, v2)
@@ -239,11 +179,59 @@ for i in xrange(520):
             if  p > score:
                 score = p
                 category = j+1
-    category_[i][0] = category
+    modi_df.loc[i, 'category'] = category
                 
-modi_df = pd.concat( modi_df, pd.DataFrame(category_))
-print modi_df
+'''
+fig = plt.figure(num=None, figsize=(40, 32) )
+m = Basemap(projection='merc',llcrnrlat=-80,urcrnrlat=80,llcrnrlon=-180,urcrnrlon=180,resolution='c')
+m.drawcoastlines()
+#m.fillcontinents(color='tan', lake_color='lightblue', ax=fig)
+m.drawparallels(np.arange(-90.,91.,30.),labels=[True,True,False,False],dashes=[2,2])
+m.drawmeridians(np.arange(-180.,181.,60.),labels=[False,False,False,True],dashes=[2,2])
+m.drawmapboundary(fill_color='lightblue')
 
+count = 0
+
+for i in xrange(520):
+    try:
+        r = modi_df.loc[i]
+        location = geolocator.geocode(r['city'])
+        longitude = location.longitude
+        latitude = location.latitude  
+        x,y = m(longitude, latitude)
+        year_ = int(r['year'])
+        if year_ == 2014: 
+            m.plot(x,y,marker='o',color='r',markersize=10)
+        elif year_ == 2015:
+            m.plot(x,y,marker='o',color='m',markersize=10)
+        elif year_ == 2016:
+            m.plot(x,y,marker='o',color='g',markersize=10)
+        elif year_ == 2017:
+            m.plot(x,y,marker='o',color='y',markersize=10)
+        count += 1
+    except:
+        None
+        
+    print count
     
 
+plt.title("PM Speeches")   
+plt.show() 
+ 
+'''
+'''
+sizes = [0]*10
+for i in xrange(520):
+    sizes[modi_df.loc[i, 'category']-1] += 1
+    
+colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'red', 'white', 'tan', 'green', 'magenta', 'pink']
 
+labels = ['Topic1', 'Topic2', 'Topic3', 'Topic4', 'Topic5', 'Topic6', 'Topic7', 'Topic8', 'Topic9', 'Topic10']
+plt.pie(sizes,  labels=labels, colors=colors,
+        autopct='%1.1f%%', shadow=True, startangle=140)
+    
+
+plt.axis('equal')
+plt.show()
+
+'''
