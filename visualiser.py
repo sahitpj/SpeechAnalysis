@@ -66,5 +66,22 @@ class visualiser(object):
         
         plt.axis('equal')
         plt.show()
+        
+    def speech_timeline(self, speeches_df, number_of_clusters=10):
+        distribution = np.zeros((number_of_clusters,4))
+        for i in xrange(len(speeches_df['category'].values)):
+            r = speeches_df.loc[i, 'category']
+            p = speeches_df.loc[i, 'year']
+            distribution[int(r)-1][int(p)-2014] += 1
+            
+            
+        plt.figure(1)    
+        k =[2014, 2015, 2016, 2017]
+        for i in xrange(number_of_clusters):
+            n = [ distribution[i][p] for p in xrange(4) ]
+            plt.subplot()
+            plt.plot(k, n, ) 
+        plt.show()    
+      
 
                 

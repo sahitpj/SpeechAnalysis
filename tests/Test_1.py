@@ -161,8 +161,10 @@ from scipy.sparse import csr_matrix
 km.fit(X)
 order_centroids = km.cluster_centers_.argsort()[:, ::-1]
 terms = vectorizer.get_feature_names()
+centroids = []
 for i in range(number_of_clusters):
     top_words = [terms[ind] for ind in order_centroids[i, :7]]
+    centroids.append(' '.join(top_words))
     print("Cluster {}: {}".format(i, ' '.join(top_words)))
       
 category_ = np.zeros((520, 1))
@@ -235,3 +237,20 @@ plt.axis('equal')
 plt.show()
 
 '''
+
+distribution = np.zeros((number_of_clusters,4))
+for i in xrange(len(modi_df['category'].values)):
+    r = modi_df.loc[i, 'category']
+    p = modi_df.loc[i, 'year']
+    distribution[int(r)-1][int(p)-2014] += 1
+    
+    
+plt.figure(1)    
+k =[2014, 2015, 2016, 2017]
+for i in xrange(number_of_clusters):
+    n = [ distribution[i][p] for p in xrange(4) ]
+    plt.subplot()
+    plt.plot(k, n, ) 
+plt.show()    
+      
+

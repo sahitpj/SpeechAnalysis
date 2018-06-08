@@ -24,4 +24,4 @@ class Kmeans_cluster(object):
             print("Cluster {}: {}".format(i, ' '.join(top_words)))
             
             
-            
+                                                                                    
